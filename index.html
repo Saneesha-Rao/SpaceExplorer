@@ -1928,7 +1928,6 @@
             this.emoji = type.emoji;
             this.label = type.label;
             this.size = type.size;
-            this.rotation = Math.atan2(this.vy, this.vx) + Math.PI / 2;
 
             // Spawn from a random edge and aim toward the play area
             const edge = randInt(0, 3); // 0=top, 1=right, 2=bottom, 3=left
@@ -1959,6 +1958,8 @@
                     this.vy = rand(-1, 1);
                     break;
             }
+            // Align rotation with travel direction
+            this.rotation = Math.atan2(this.vy, this.vx) + Math.PI / 2;
         }
         update() {
             this.x += this.vx;
