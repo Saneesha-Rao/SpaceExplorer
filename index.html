@@ -1650,7 +1650,7 @@
             this.angle = rand(0, Math.PI * 2);
             this.orbitSpeed = rand(0.003, 0.009) * (Math.random() < 0.5 ? 1 : -1);
             this.orbitSpeed *= (CONFIG.ORBIT_MAX / this.orbitRadius) * 0.4;
-            this.size = rand(10, 16);
+            this.size = rand(18, 26);
             this.rotation = rand(0, Math.PI * 2);
             this.rotSpeed = rand(-0.01, 0.01);
             this.panelAngle = 0;
@@ -1768,6 +1768,21 @@
                 ctx.arc(s * 0.3, -s * 0.3, 4, 0, Math.PI * 2);
                 ctx.fill();
             }
+
+            // Red X warning
+            ctx.globalAlpha = 0.45;
+            ctx.strokeStyle = '#ff3333';
+            ctx.lineWidth = 3;
+            const xSize = s * 0.9;
+            ctx.beginPath();
+            ctx.moveTo(-xSize, -xSize);
+            ctx.lineTo(xSize, xSize);
+            ctx.stroke();
+            ctx.beginPath();
+            ctx.moveTo(xSize, -xSize);
+            ctx.lineTo(-xSize, xSize);
+            ctx.stroke();
+            ctx.globalAlpha = 1;
 
             // Highlight
             ctx.fillStyle = 'rgba(255,255,255,0.15)';
