@@ -782,7 +782,7 @@
             '📡', '🛰️', '⚙️', '🔧', '🔩',  // satellite parts
             '🔌', '🪫', '🧲',                   // electrical parts
             '🛸', '📦', '🗑️',                   // junk
-            '🧤', '🧱', '💥',                   // gloves & broken rocket parts
+            '🧤', '🧱',                       // gloves & broken rocket parts
         ],
         EARTH_X: 640,   // center of canvas
         EARTH_Y: 360,
@@ -2019,7 +2019,7 @@
             // Emoji body (bigger, with shadow)
             ctx.save();
             ctx.translate(this.x, this.y);
-            ctx.rotate(this.rotation);
+            // No rotation - emoji stays upright, fire trail shows direction
             // Shadow
             ctx.globalAlpha = 0.3;
             ctx.font = `${this.size + 6}px Arial`;
