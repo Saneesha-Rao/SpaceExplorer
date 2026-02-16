@@ -551,6 +551,123 @@
             background: rgba(255, 235, 59, 0.1);
             transform: scale(1.05);
         }
+
+        /* ===== MOBILE RESPONSIVE ===== */
+        @media (max-width: 768px) {
+            .top-banner {
+                font-size: 10px;
+                padding: 2px 0;
+                letter-spacing: 1px;
+            }
+            #gameContainer {
+                border-width: 2px;
+                border-radius: 8px;
+            }
+            canvas { border-radius: 6px; }
+            #uiOverlay {
+                padding: 4px 8px;
+            }
+            .score-display {
+                font-size: 12px;
+                padding: 3px 10px;
+                border-width: 1px;
+            }
+            .score-display span {
+                font-size: 14px;
+            }
+            .level-display {
+                font-size: 10px;
+                padding: 3px 10px;
+                border-width: 1px;
+            }
+            .lives-display {
+                font-size: 14px;
+            }
+            .game-title {
+                font-size: 28px;
+                margin-bottom: 4px;
+            }
+            .game-subtitle {
+                font-size: 11px;
+                margin-bottom: 8px;
+            }
+            #startScreen > div[style*="font-size:16px"] ,
+            .exhibition-credit {
+                font-size: 11px !important;
+                margin-bottom: 10px !important;
+            }
+            .start-btn {
+                font-size: 16px;
+                padding: 8px 28px;
+                margin-bottom: 6px !important;
+            }
+            .start-lb-btn {
+                font-size: 12px;
+                padding: 5px 18px;
+                margin-top: 4px;
+            }
+            .instructions {
+                font-size: 10px;
+                margin-top: 8px;
+                line-height: 1.6;
+            }
+            .instructions .key {
+                font-size: 10px;
+                padding: 1px 6px;
+                margin: 0 1px;
+            }
+            .game-over-title {
+                font-size: 24px;
+                margin-bottom: 4px;
+            }
+            .final-score {
+                font-size: 32px;
+                margin: 6px 0;
+            }
+            .final-label {
+                font-size: 14px;
+            }
+            .name-input-row {
+                gap: 6px;
+                margin-top: 6px;
+            }
+            .name-input {
+                font-size: 13px;
+                padding: 5px 10px;
+                width: 130px;
+            }
+            .save-btn {
+                font-size: 12px;
+                padding: 5px 14px;
+            }
+            #factBanner {
+                width: 90%;
+                padding: 14px 16px;
+            }
+            .fact-header { font-size: 16px; }
+            .fact-level { font-size: 12px; margin-bottom: 8px; }
+            .fact-text { font-size: 13px; }
+            .fact-emoji { font-size: 24px; }
+            .fact-year-badge { font-size: 18px; padding: 2px 14px; }
+            .fact-continue-btn { font-size: 14px; padding: 6px 22px; }
+            .lb-title { font-size: 22px; margin-bottom: 8px; }
+            .lb-table { width: 90%; }
+            .lb-table th { font-size: 11px; padding: 4px 8px; }
+            .lb-table td { font-size: 12px; padding: 4px 8px; }
+            .lb-btn { font-size: 14px; padding: 6px 20px; }
+        }
+
+        /* Portrait orientation: suggest rotating */
+        @media (max-aspect-ratio: 1/1) and (max-width: 768px) {
+            #gameContainer {
+                max-height: none;
+                width: 100vw;
+            }
+            .top-banner {
+                font-size: 9px;
+                padding: 1px 0;
+            }
+        }
     </style>
 </head>
 <body>
@@ -575,7 +692,7 @@
             </div>
             <div class="game-title">🚀 Space Cleaners! 🌟</div>
             <div class="game-subtitle">Help clean up outer space from floating debris!</div>
-            <div style="font-family:'Fredoka One',cursive;font-size:16px;color:#6bf0ff;margin-bottom:28px;text-shadow:0 0 10px rgba(107,240,255,0.4);letter-spacing:1px;">PYP Exhibition project by - Ayra, Ayansh, Parv, Reyansh and Srreenika</div>
+            <div class="exhibition-credit" style="font-family:'Fredoka One',cursive;font-size:16px;color:#6bf0ff;margin-bottom:28px;text-shadow:0 0 10px rgba(107,240,255,0.4);letter-spacing:1px;">PYP Exhibition project by - Ayra, Ayansh, Parv, Reyansh and Srreenika</div>
             <button class="start-btn" id="startBtn" style="margin-bottom:14px;">🎮 Start Cleaning!</button>
             <button class="start-lb-btn" id="startLbBtn">🏆 Leaderboard</button>
             <div class="instructions">
