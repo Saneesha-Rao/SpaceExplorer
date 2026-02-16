@@ -642,10 +642,60 @@
             .start-btn { font-size: 12px; padding: 5px 18px; }
             .exhibition-credit { font-size: 8px !important; }
         }
+
+        /* Rotate device overlay */
+        #rotateOverlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: #0a0a2e;
+            z-index: 9999;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-family: 'Fredoka One', cursive;
+        }
+        #rotateOverlay .rotate-icon {
+            font-size: 80px;
+            animation: rotateWiggle 2s ease-in-out infinite;
+            margin-bottom: 20px;
+        }
+        #rotateOverlay .rotate-text {
+            font-size: 22px;
+            color: #6bf0ff;
+            text-align: center;
+            padding: 0 30px;
+            text-shadow: 0 0 10px rgba(107, 240, 255, 0.4);
+        }
+        #rotateOverlay .rotate-sub {
+            font-size: 14px;
+            color: #8888cc;
+            margin-top: 10px;
+            font-family: 'Baloo 2', cursive;
+        }
+        @keyframes rotateWiggle {
+            0%, 100% { transform: rotate(0deg); }
+            25% { transform: rotate(90deg); }
+            75% { transform: rotate(90deg); }
+        }
+
+        @media (orientation: portrait) and (max-width: 768px) and (pointer: coarse) {
+            #rotateOverlay { display: flex; }
+            #gameContainer { display: none; }
+            .top-banner { display: none; }
+        }
     </style>
 </head>
 <body>
     <div class="top-banner">🌟 Sreenidhi PYP Exhibition Project by 5C 🌟</div>
+
+    <div id="rotateOverlay">
+        <div class="rotate-icon">📱</div>
+        <div class="rotate-text">Rotate your device to landscape mode</div>
+        <div class="rotate-sub">The game plays best in landscape orientation!</div>
+    </div>
+
     <div id="gameContainer">
         <canvas id="gameCanvas"></canvas>
         
