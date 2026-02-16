@@ -3012,8 +3012,27 @@
     pauseBtn.addEventListener('click', togglePause);
     resumeBtn.addEventListener('click', togglePause);
 
-    function gameLoop() {
-        update();
+    // ===== FIXED TIMESTEP GAME LOOP =====
+    const FIXED_DT = 1000 / 60; // 16.67ms per tick (60fps equivalent)
+    let lastTime = 0;
+    let accumulator = 0;
+
+    function gameLoop(timestamp) {
+        if (!lastTime) lastTime = timestamp;
+        let elapsed = timestamp - lastTime;
+        lastTime = timestamp;
+
+        // Cap elapsed to prevent spiral of death (e.g. tab was hidden)
+        if (elapsed > 200) elapsed = 200;
+
+        if (!paused) {
+            accumulator += elapsed;
+            while (accumulator >= FIXED_DT) {
+                update();
+                accumulator -= FIXED_DT;
+            }
+        }
+
         draw();
         requestAnimationFrame(gameLoop);
     }
@@ -3110,7 +3129,7 @@
     }
 
     // Unified game loop
-    gameLoop();
+    requestAnimationFrame(gameLoop);
 
     // Sound effects using Web Audio API (optional, kid-friendly)
     const AudioCtx = window.AudioContext || window.webkitAudioContext;
