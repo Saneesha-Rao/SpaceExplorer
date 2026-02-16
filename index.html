@@ -793,7 +793,7 @@
         MAX_LEVEL: 10,
         LEVEL_UP_SCORE: 15,
         SHIELD_DURATION: 3000,
-        INVINCIBLE_DURATION: 2000,
+        INVINCIBLE_DURATION: 3000,
         POWERUP_DURATION: 6000,
         POWERUP_SPAWN_INTERVAL: 900, // frames between spawns (~15s at 60fps)
         HAZARD_SPAWN_INTERVAL: 600,    // frames between incoming hazards (~10s)
@@ -2396,6 +2396,13 @@
         rocket.invincibleTimer = CONFIG.INVINCIBLE_DURATION;
         shakeTimer = 15;
 
+        // Push rocket away from the collision
+        const angle = Math.atan2(rocket.y - h.y, rocket.x - h.x);
+        rocket.x += Math.cos(angle) * 60;
+        rocket.y += Math.sin(angle) * 60;
+        rocket.x = Math.max(20, Math.min(CONFIG.WIDTH - 20, rocket.x));
+        rocket.y = Math.max(20, Math.min(CONFIG.HEIGHT - 20, rocket.y));
+
         // Explosion particles
         for (let i = 0; i < 20; i++) {
             const colors = ['#ff4444', '#ff8800', '#ffcc00', '#ffffff'];
@@ -2458,6 +2465,13 @@
         lives--;
         rocket.invincibleTimer = CONFIG.INVINCIBLE_DURATION;
         shakeTimer = 15;
+
+        // Push rocket away from the collision
+        const angle = Math.atan2(rocket.y - a.y, rocket.x - a.x);
+        rocket.x += Math.cos(angle) * 60;
+        rocket.y += Math.sin(angle) * 60;
+        rocket.x = Math.max(20, Math.min(CONFIG.WIDTH - 20, rocket.x));
+        rocket.y = Math.max(20, Math.min(CONFIG.HEIGHT - 20, rocket.y));
 
         // Explosion particles
         for (let i = 0; i < 20; i++) {
