@@ -93,23 +93,24 @@
         }
 
         #pauseBtn {
-            background: rgba(255,255,255,0.15);
+            background: linear-gradient(135deg, rgba(255, 107, 255, 0.4), rgba(107, 107, 255, 0.4));
+            backdrop-filter: blur(10px);
             border: 2px solid rgba(255,255,255,0.3);
             color: #fff;
             font-family: 'Fredoka One', cursive;
-            font-size: 28px;
-            width: 48px;
-            height: 48px;
-            border-radius: 50%;
+            font-size: 24px;
+            padding: 8px 20px;
+            border-radius: 30px;
             cursor: pointer;
             pointer-events: all;
             display: flex;
             align-items: center;
             justify-content: center;
             transition: background 0.2s;
+            text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
         }
         #pauseBtn:hover {
-            background: rgba(255,255,255,0.3);
+            background: linear-gradient(135deg, rgba(255, 107, 255, 0.6), rgba(107, 107, 255, 0.6));
         }
 
         #pauseOverlay {
@@ -756,7 +757,7 @@
             <div class="score-display">⭐ Score: <span id="scoreText">0</span></div>
             <div class="level-display">🪐 Level <span id="levelText">1</span></div>
             <div class="lives-display" id="livesDisplay">💚💚💚</div>
-            <button id="pauseBtn" title="Pause">⏸</button>
+            <button id="pauseBtn" title="Pause">⏸ Pause</button>
         </div>
 
         <div id="pauseOverlay">
@@ -2880,7 +2881,7 @@
         if (gameState !== 'playing') return;
         paused = !paused;
         pauseOverlay.style.display = paused ? 'flex' : 'none';
-        pauseBtn.textContent = paused ? '▶' : '⏸';
+        pauseBtn.textContent = paused ? '▶ Resume' : '⏸ Pause';
     }
 
     pauseBtn.addEventListener('click', togglePause);
