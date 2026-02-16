@@ -1998,21 +1998,6 @@
             ctx.stroke();
             ctx.setLineDash([]);
 
-            // Red "X" crosshair behind emoji
-            ctx.globalAlpha = 0.35;
-            ctx.strokeStyle = '#ff3333';
-            ctx.lineWidth = 2.5;
-            const crossSize = this.size * 0.7;
-            ctx.beginPath();
-            ctx.moveTo(this.x - crossSize, this.y - crossSize);
-            ctx.lineTo(this.x + crossSize, this.y + crossSize);
-            ctx.stroke();
-            ctx.beginPath();
-            ctx.moveTo(this.x + crossSize, this.y - crossSize);
-            ctx.lineTo(this.x - crossSize, this.y + crossSize);
-            ctx.stroke();
-            ctx.globalAlpha = 1;
-
             // Emoji body (bigger, with shadow)
             ctx.save();
             ctx.translate(this.x, this.y);
