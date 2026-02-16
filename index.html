@@ -103,6 +103,7 @@
             border-radius: 12px;
             z-index: 20;
             transition: opacity 0.5s;
+            overflow: auto;
         }
 
         #gameOverScreen {
@@ -810,6 +811,32 @@
         }
         container.style.width = Math.floor(w) + 'px';
         container.style.height = Math.floor(h) + 'px';
+
+        // Scale overlays to fit the container
+        const scaleFactor = Math.min(w / 900, h / 500);
+        const clampedScale = Math.min(1, scaleFactor);
+        const overlays = ['startScreen', 'gameOverScreen', 'leaderboardScreen'];
+        overlays.forEach(id => {
+            const el = document.getElementById(id);
+            if (el) {
+                el.style.transform = `scale(${clampedScale})`;
+                el.style.transformOrigin = 'center center';
+            }
+        });
+
+        // Scale UI overlay (score/level/lives)
+        const uiOverlay = document.getElementById('uiOverlay');
+        if (uiOverlay) {
+            const uiScale = Math.min(1, w / 700);
+            uiOverlay.style.transform = `scale(${uiScale})`;
+            uiOverlay.style.transformOrigin = 'top center';
+        }
+
+        // Scale fact banner
+        const factBanner = document.getElementById('factBanner');
+        if (factBanner) {
+            factBanner.style.setProperty('--fact-scale', clampedScale);
+        }
     }
     window.addEventListener('resize', resizeGame);
     window.addEventListener('orientationchange', () => setTimeout(resizeGame, 100));
