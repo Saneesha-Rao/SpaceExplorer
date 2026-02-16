@@ -92,6 +92,59 @@
             filter: drop-shadow(0 0 5px rgba(255, 0, 0, 0.5));
         }
 
+        #pauseBtn {
+            background: rgba(255,255,255,0.15);
+            border: 2px solid rgba(255,255,255,0.3);
+            color: #fff;
+            font-family: 'Fredoka One', cursive;
+            font-size: 28px;
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            cursor: pointer;
+            pointer-events: all;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.2s;
+        }
+        #pauseBtn:hover {
+            background: rgba(255,255,255,0.3);
+        }
+
+        #pauseOverlay {
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.6);
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 50;
+        }
+        #pauseOverlay .pause-title {
+            font-family: 'Fredoka One', cursive;
+            font-size: 60px;
+            color: #fff;
+            text-shadow: 0 0 20px rgba(107, 240, 255, 0.8);
+            margin-bottom: 20px;
+        }
+        #resumeBtn {
+            font-family: 'Fredoka One', cursive;
+            font-size: 28px;
+            padding: 15px 50px;
+            border: none;
+            border-radius: 30px;
+            cursor: pointer;
+            color: #fff;
+            background: linear-gradient(135deg, #6bff6b, #00cc88);
+            box-shadow: 0 4px 15px rgba(0,204,136,0.5);
+            transition: transform 0.2s;
+        }
+        #resumeBtn:hover {
+            transform: scale(1.05);
+        }
+
         #startScreen, #gameOverScreen {
             position: absolute;
             top: 0; left: 0; right: 0; bottom: 0;
@@ -703,6 +756,12 @@
             <div class="score-display">⭐ Score: <span id="scoreText">0</span></div>
             <div class="level-display">🪐 Level <span id="levelText">1</span></div>
             <div class="lives-display" id="livesDisplay">💚💚💚</div>
+            <button id="pauseBtn" title="Pause">⏸</button>
+        </div>
+
+        <div id="pauseOverlay">
+            <div class="pause-title">⏸ PAUSED</div>
+            <button id="resumeBtn">▶ Resume</button>
         </div>
 
         <div id="startScreen">
@@ -959,7 +1018,8 @@
     ];
 
     // ===== GAME STATE =====
-    let gameState = 'start'; // start, playing, gameover
+    let gameState = 'start'; // start, playing, paused, gameover
+    let paused = false;
     let score = 0;
     let lives = 3;
     let level = 1;
@@ -981,6 +1041,9 @@
         keys[e.key] = true;
         if (['ArrowUp','ArrowDown','ArrowLeft','ArrowRight',' '].includes(e.key)) {
             e.preventDefault();
+        }
+        if (e.key === 'Escape' && gameState === 'playing') {
+            togglePause();
         }
     });
     window.addEventListener('keyup', e => { keys[e.key] = false; });
@@ -2553,6 +2616,7 @@
 
     // ===== MAIN GAME LOOP =====
     function update() {
+        if (paused) return;
         if (gameState !== 'playing' && gameState !== 'fact') return;
 
         // During fact display, keep background and orbits alive
@@ -2806,6 +2870,21 @@
 
         ctx.restore();
     }
+
+    // ===== PAUSE =====
+    const pauseBtn = document.getElementById('pauseBtn');
+    const pauseOverlay = document.getElementById('pauseOverlay');
+    const resumeBtn = document.getElementById('resumeBtn');
+
+    function togglePause() {
+        if (gameState !== 'playing') return;
+        paused = !paused;
+        pauseOverlay.style.display = paused ? 'flex' : 'none';
+        pauseBtn.textContent = paused ? '▶' : '⏸';
+    }
+
+    pauseBtn.addEventListener('click', togglePause);
+    resumeBtn.addEventListener('click', togglePause);
 
     function gameLoop() {
         update();
