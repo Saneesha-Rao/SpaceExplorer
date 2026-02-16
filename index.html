@@ -797,11 +797,11 @@
         POWERUP_SPAWN_INTERVAL: 900, // frames between spawns (~15s at 60fps)
         HAZARD_SPAWN_INTERVAL: 600,    // frames between incoming hazards (~10s)
         HAZARD_TYPES: [
-            { emoji: '🚀', label: 'Rogue Rocket', size: 30 },
-            { emoji: '🛸', label: 'UFO', size: 28 },
-            { emoji: '🛰️', label: 'Old Satellite', size: 26 },
-            { emoji: '📡', label: 'Antenna Dish', size: 24 },
-            { emoji: '☄️', label: 'Comet', size: 32 },
+            { emoji: '🚀', label: 'Rogue Rocket', size: 30, angleOffset: -Math.PI * 0.75 },
+            { emoji: '🛸', label: 'UFO', size: 28, angleOffset: 0 },
+            { emoji: '🛰️', label: 'Old Satellite', size: 26, angleOffset: -Math.PI * 0.75 },
+            { emoji: '📡', label: 'Antenna Dish', size: 24, angleOffset: -Math.PI * 0.75 },
+            { emoji: '☄️', label: 'Comet', size: 32, angleOffset: -Math.PI * 0.75 },
         ],
         POWERUP_TYPES: [
             { id: 'magnet',  emoji: '🧲', color: '#ff6bff', label: 'MAGNET',       desc: 'Pulls debris toward you!' },
@@ -1928,6 +1928,7 @@
             this.emoji = type.emoji;
             this.label = type.label;
             this.size = type.size;
+            this.angleOffset = type.angleOffset || 0;
 
             // Spawn from a random edge and aim toward the play area
             const edge = randInt(0, 3); // 0=top, 1=right, 2=bottom, 3=left
@@ -1959,7 +1960,7 @@
                     break;
             }
             // Align rotation with travel direction
-            this.rotation = Math.atan2(this.vy, this.vx) + Math.PI / 2;
+            this.rotation = Math.atan2(this.vy, this.vx) - this.angleOffset;
         }
         update() {
             this.x += this.vx;
