@@ -27,25 +27,25 @@
 
         #gameContainer {
             position: relative;
-            border: 4px solid #ff6bff;
-            border-radius: 16px;
+            border: 3px solid #ff6bff;
+            border-radius: 12px;
             box-shadow: 
                 0 0 20px rgba(255, 107, 255, 0.5),
                 0 0 60px rgba(107, 107, 255, 0.3),
                 inset 0 0 30px rgba(0, 0, 0, 0.3);
             width: 100%;
             max-width: 100vw;
-            max-height: calc(100vh - 40px);
-            max-height: calc(100dvh - 40px);
-            aspect-ratio: 3 / 2;
+            max-height: calc(100vh - 30px);
+            max-height: calc(100dvh - 30px);
+            aspect-ratio: 16 / 9;
         }
 
         .top-banner {
             font-family: 'Fredoka One', cursive;
-            font-size: 14px;
+            font-size: 13px;
             color: #6bf0ff;
             text-align: center;
-            padding: 6px 0;
+            padding: 4px 0;
             letter-spacing: 1.5px;
             text-shadow: 0 0 8px rgba(107, 240, 255, 0.4);
         }
@@ -629,24 +629,24 @@
     <script>
     // ===== GAME CONFIGURATION =====
     const CONFIG = {
-        WIDTH: 900,
-        HEIGHT: 600,
-        ROCKET_SPEED: 5,
+        WIDTH: 1280,
+        HEIGHT: 720,
+        ROCKET_SPEED: 6,
         ROCKET_SIZE: 40,
         DEBRIS_COUNT: 6,
         ASTEROID_COUNT: 3,
         SATELLITE_COUNT: 2,
-        STAR_COUNT: 120,
+        STAR_COUNT: 180,
         DEBRIS_TYPES: [
             '📡', '🛰️', '⚙️', '🔧', '🔩',  // satellite parts
             '🔌', '🪫', '🧲',                   // electrical parts
             '🛸', '📦', '🗑️',                   // junk
         ],
-        EARTH_X: 450,   // center of canvas
-        EARTH_Y: 300,
-        EARTH_RADIUS: 55,
-        ORBIT_MIN: 120,  // inner orbit radius
-        ORBIT_MAX: 260,  // outer orbit radius
+        EARTH_X: 640,   // center of canvas
+        EARTH_Y: 360,
+        EARTH_RADIUS: 60,
+        ORBIT_MIN: 140,  // inner orbit radius
+        ORBIT_MAX: 310,  // outer orbit radius
         PARTICLE_COUNT: 8,
         MAX_LEVEL: 10,
         LEVEL_UP_SCORE: 15,
@@ -684,7 +684,7 @@
         const bannerH = banner ? banner.offsetHeight : 30;
         const maxW = window.innerWidth;
         const maxH = window.innerHeight - bannerH - 10;
-        const aspect = CONFIG.WIDTH / CONFIG.HEIGHT; // 3:2
+        const aspect = CONFIG.WIDTH / CONFIG.HEIGHT; // 16:9
         let w = maxW;
         let h = w / aspect;
         if (h > maxH) {
