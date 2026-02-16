@@ -556,118 +556,91 @@
         /* ===== MOBILE RESPONSIVE ===== */
         @media (max-width: 768px) {
             .top-banner {
-                font-size: 10px;
-                padding: 2px 0;
-                letter-spacing: 1px;
+                display: none;
+            }
+            body {
+                justify-content: flex-start;
+                padding-top: 2px;
             }
             #gameContainer {
                 border-width: 2px;
-                border-radius: 8px;
+                border-radius: 6px;
+                max-height: 100vh;
+                max-height: 100dvh;
             }
-            canvas { border-radius: 6px; }
-            #uiOverlay {
-                padding: 4px 8px;
-            }
-            .score-display {
-                font-size: 12px;
-                padding: 3px 10px;
-                border-width: 1px;
-            }
-            .score-display span {
-                font-size: 14px;
-            }
-            .level-display {
-                font-size: 10px;
-                padding: 3px 10px;
-                border-width: 1px;
-            }
-            .lives-display {
-                font-size: 14px;
-            }
-            .game-title {
-                font-size: 28px;
-                margin-bottom: 4px;
-            }
-            .game-subtitle {
-                font-size: 11px;
-                margin-bottom: 8px;
-            }
-            #startScreen > div[style*="font-size:16px"] ,
+            canvas { border-radius: 4px; }
+
+            /* UI Overlay */
+            #uiOverlay { padding: 3px 6px; }
+            .score-display { font-size: 11px; padding: 2px 8px; border-width: 1px; }
+            .score-display span { font-size: 12px; }
+            .level-display { font-size: 9px; padding: 2px 8px; border-width: 1px; }
+            .lives-display { font-size: 12px; }
+
+            /* Start Screen */
+            .decorative-stars { display: none; }
+            .game-title { font-size: 22px; margin-bottom: 2px; line-height: 1.1; }
+            .game-subtitle { font-size: 10px; margin-bottom: 4px; }
             .exhibition-credit {
-                font-size: 11px !important;
-                margin-bottom: 10px !important;
+                font-size: 9px !important;
+                margin-bottom: 6px !important;
+                letter-spacing: 0.5px !important;
+                padding: 0 10px;
             }
             .start-btn {
-                font-size: 16px;
-                padding: 8px 28px;
-                margin-bottom: 6px !important;
+                font-size: 14px;
+                padding: 6px 22px;
+                margin-bottom: 4px !important;
             }
             .start-lb-btn {
-                font-size: 12px;
-                padding: 5px 18px;
-                margin-top: 4px;
+                font-size: 10px;
+                padding: 4px 14px;
+                margin-top: 2px;
             }
             .instructions {
-                font-size: 10px;
-                margin-top: 8px;
-                line-height: 1.6;
+                font-size: 8px;
+                margin-top: 4px;
+                line-height: 1.4;
             }
             .instructions .key {
-                font-size: 10px;
-                padding: 1px 6px;
+                font-size: 8px;
+                padding: 0px 4px;
                 margin: 0 1px;
             }
-            .game-over-title {
-                font-size: 24px;
-                margin-bottom: 4px;
-            }
-            .final-score {
-                font-size: 32px;
-                margin: 6px 0;
-            }
-            .final-label {
-                font-size: 14px;
-            }
-            .name-input-row {
-                gap: 6px;
-                margin-top: 6px;
-            }
-            .name-input {
-                font-size: 13px;
-                padding: 5px 10px;
-                width: 130px;
-            }
-            .save-btn {
-                font-size: 12px;
-                padding: 5px 14px;
-            }
-            #factBanner {
-                width: 90%;
-                padding: 14px 16px;
-            }
-            .fact-header { font-size: 16px; }
-            .fact-level { font-size: 12px; margin-bottom: 8px; }
-            .fact-text { font-size: 13px; }
-            .fact-emoji { font-size: 24px; }
-            .fact-year-badge { font-size: 18px; padding: 2px 14px; }
-            .fact-continue-btn { font-size: 14px; padding: 6px 22px; }
-            .lb-title { font-size: 22px; margin-bottom: 8px; }
-            .lb-table { width: 90%; }
-            .lb-table th { font-size: 11px; padding: 4px 8px; }
-            .lb-table td { font-size: 12px; padding: 4px 8px; }
-            .lb-btn { font-size: 14px; padding: 6px 20px; }
+
+            /* Game Over */
+            .game-over-title { font-size: 20px; margin-bottom: 2px; }
+            .final-score { font-size: 28px; margin: 4px 0; }
+            .final-label { font-size: 12px; }
+            .name-input-row { gap: 4px; margin-top: 4px; }
+            .name-input { font-size: 11px; padding: 4px 8px; width: 110px; }
+            .save-btn { font-size: 10px; padding: 4px 12px; }
+
+            /* Fact Banner */
+            #factBanner { width: 92%; padding: 10px 12px; }
+            .fact-header { font-size: 14px; margin-bottom: 2px; }
+            .fact-level { font-size: 10px; margin-bottom: 4px; }
+            .fact-text { font-size: 11px; line-height: 1.4; }
+            .fact-emoji { font-size: 20px; margin-bottom: 4px; }
+            .fact-year-badge { font-size: 14px; padding: 1px 10px; }
+            .fact-divider { margin: 6px 0; }
+            .fact-continue-btn { font-size: 12px; padding: 5px 18px; margin-top: 8px; }
+
+            /* Leaderboard */
+            .lb-title { font-size: 18px; margin-bottom: 6px; }
+            .lb-table { width: 92%; }
+            .lb-table th { font-size: 10px; padding: 3px 6px; }
+            .lb-table td { font-size: 11px; padding: 3px 6px; }
+            .lb-btn { font-size: 12px; padding: 5px 16px; }
         }
 
-        /* Portrait orientation: suggest rotating */
-        @media (max-aspect-ratio: 1/1) and (max-width: 768px) {
-            #gameContainer {
-                max-height: none;
-                width: 100vw;
-            }
-            .top-banner {
-                font-size: 9px;
-                padding: 1px 0;
-            }
+        /* Extra small phones */
+        @media (max-width: 400px) {
+            .game-title { font-size: 18px; }
+            .game-subtitle { display: none; }
+            .instructions { display: none; }
+            .start-btn { font-size: 12px; padding: 5px 18px; }
+            .exhibition-credit { font-size: 8px !important; }
         }
     </style>
 </head>
@@ -799,9 +772,10 @@
     function resizeGame() {
         const container = document.getElementById('gameContainer');
         const banner = document.querySelector('.top-banner');
-        const bannerH = banner ? banner.offsetHeight : 30;
+        const isMobile = window.innerWidth <= 768;
+        const bannerH = (banner && !isMobile) ? banner.offsetHeight : 0;
         const maxW = window.innerWidth;
-        const maxH = window.innerHeight - bannerH - 10;
+        const maxH = window.innerHeight - bannerH - (isMobile ? 4 : 10);
         const aspect = CONFIG.WIDTH / CONFIG.HEIGHT; // 16:9
         let w = maxW;
         let h = w / aspect;
@@ -811,32 +785,6 @@
         }
         container.style.width = Math.floor(w) + 'px';
         container.style.height = Math.floor(h) + 'px';
-
-        // Scale overlays to fit the container
-        const scaleFactor = Math.min(w / 900, h / 500);
-        const clampedScale = Math.min(1, scaleFactor);
-        const overlays = ['startScreen', 'gameOverScreen', 'leaderboardScreen'];
-        overlays.forEach(id => {
-            const el = document.getElementById(id);
-            if (el) {
-                el.style.transform = `scale(${clampedScale})`;
-                el.style.transformOrigin = 'center center';
-            }
-        });
-
-        // Scale UI overlay (score/level/lives)
-        const uiOverlay = document.getElementById('uiOverlay');
-        if (uiOverlay) {
-            const uiScale = Math.min(1, w / 700);
-            uiOverlay.style.transform = `scale(${uiScale})`;
-            uiOverlay.style.transformOrigin = 'top center';
-        }
-
-        // Scale fact banner
-        const factBanner = document.getElementById('factBanner');
-        if (factBanner) {
-            factBanner.style.setProperty('--fact-scale', clampedScale);
-        }
     }
     window.addEventListener('resize', resizeGame);
     window.addEventListener('orientationchange', () => setTimeout(resizeGame, 100));
