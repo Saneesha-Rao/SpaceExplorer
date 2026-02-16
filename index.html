@@ -808,6 +808,77 @@
     });
     window.addEventListener('keyup', e => { keys[e.key] = false; });
 
+    // ===== TOUCH CONTROLS (virtual joystick) =====
+    const touch = { active: false, startX: 0, startY: 0, dx: 0, dy: 0 };
+    const JOYSTICK_RADIUS = 50;
+    const JOYSTICK_DEAD_ZONE = 8;
+
+    canvas.addEventListener('touchstart', e => {
+        e.preventDefault();
+        if (gameState !== 'playing') return;
+        const t = e.touches[0];
+        const rect = canvas.getBoundingClientRect();
+        touch.active = true;
+        touch.startX = t.clientX - rect.left;
+        touch.startY = t.clientY - rect.top;
+        touch.dx = 0;
+        touch.dy = 0;
+    }, { passive: false });
+
+    canvas.addEventListener('touchmove', e => {
+        e.preventDefault();
+        if (!touch.active) return;
+        const t = e.touches[0];
+        const rect = canvas.getBoundingClientRect();
+        const cx = t.clientX - rect.left;
+        const cy = t.clientY - rect.top;
+        let rawDx = cx - touch.startX;
+        let rawDy = cy - touch.startY;
+        const dist = Math.hypot(rawDx, rawDy);
+        if (dist > JOYSTICK_RADIUS) {
+            rawDx = (rawDx / dist) * JOYSTICK_RADIUS;
+            rawDy = (rawDy / dist) * JOYSTICK_RADIUS;
+        }
+        touch.dx = dist > JOYSTICK_DEAD_ZONE ? rawDx / JOYSTICK_RADIUS : 0;
+        touch.dy = dist > JOYSTICK_DEAD_ZONE ? rawDy / JOYSTICK_RADIUS : 0;
+    }, { passive: false });
+
+    canvas.addEventListener('touchend', e => {
+        e.preventDefault();
+        touch.active = false;
+        touch.dx = 0;
+        touch.dy = 0;
+    }, { passive: false });
+
+    canvas.addEventListener('touchcancel', e => {
+        touch.active = false;
+        touch.dx = 0;
+        touch.dy = 0;
+    });
+
+    function drawJoystick() {
+        if (!touch.active) return;
+        // Outer ring
+        ctx.globalAlpha = 0.25;
+        ctx.strokeStyle = '#6bf0ff';
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.arc(touch.startX, touch.startY, JOYSTICK_RADIUS, 0, Math.PI * 2);
+        ctx.stroke();
+        ctx.fillStyle = 'rgba(107, 240, 255, 0.08)';
+        ctx.fill();
+
+        // Inner knob
+        const knobX = touch.startX + touch.dx * JOYSTICK_RADIUS;
+        const knobY = touch.startY + touch.dy * JOYSTICK_RADIUS;
+        ctx.globalAlpha = 0.5;
+        ctx.fillStyle = '#6bf0ff';
+        ctx.beginPath();
+        ctx.arc(knobX, knobY, 16, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.globalAlpha = 1;
+    }
+
     // ===== UTILITY FUNCTIONS =====
     function rand(min, max) { return Math.random() * (max - min) + min; }
     function randInt(min, max) { return Math.floor(rand(min, max + 1)); }
@@ -1080,6 +1151,12 @@
             if (keys['ArrowRight'] || keys['d']) dx = 1;
             if (keys['ArrowUp'] || keys['w']) dy = -1;
             if (keys['ArrowDown'] || keys['s']) dy = 1;
+
+            // Touch joystick input
+            if (touch.active && (Math.abs(touch.dx) > 0 || Math.abs(touch.dy) > 0)) {
+                dx = touch.dx;
+                dy = touch.dy;
+            }
 
             // Diagonal normalization
             if (dx !== 0 && dy !== 0) {
@@ -2466,6 +2543,9 @@
             rocket.draw();
             particles.forEach(p => p.draw());
             scorePopups.forEach(p => p.draw());
+
+            // Draw virtual joystick on touch
+            drawJoystick();
 
             // Draw active power-up indicators (bottom-left)
             const activeKeys = Object.keys(activePowerups);
