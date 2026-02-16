@@ -1588,7 +1588,7 @@
             this.orbitSpeed = rand(0.004, 0.012) * (Math.random() < 0.5 ? 1 : -1); // CW or CCW
             this.orbitSpeed *= (CONFIG.ORBIT_MAX / this.orbitRadius) * 0.6; // inner orbits faster
             this.emoji = CONFIG.DEBRIS_TYPES[randInt(0, CONFIG.DEBRIS_TYPES.length - 1)];
-            this.size = rand(18, 28);
+            this.size = rand(26, 36);
             this.rotSpeed = rand(-0.03, 0.03);
             this.rotation = rand(0, Math.PI * 2);
             this.glowHue = randInt(100, 180);
