@@ -858,11 +858,11 @@
         POWERUP_SPAWN_INTERVAL: 900, // frames between spawns (~15s at 60fps)
         HAZARD_SPAWN_INTERVAL: 600,    // frames between incoming hazards (~10s)
         HAZARD_TYPES: [
-            { emoji: '🚀', label: 'Rogue Rocket', size: 30, angleOffset: -Math.PI / 2 },
+            { emoji: '🚀', label: 'Rogue Rocket', size: 30, angleOffset: -Math.PI / 4 },
             { emoji: '🛸', label: 'UFO', size: 28, angleOffset: 0 },
-            { emoji: '🛰️', label: 'Old Satellite', size: 26, angleOffset: -Math.PI / 4 },
-            { emoji: '📡', label: 'Antenna Dish', size: 24, angleOffset: -Math.PI / 4 },
-            { emoji: '☄️', label: 'Comet', size: 32, angleOffset: -Math.PI * 0.75 },
+            { emoji: '🛰️', label: 'Old Satellite', size: 26, angleOffset: 0 },
+            { emoji: '📡', label: 'Antenna Dish', size: 24, angleOffset: -Math.PI / 2 },
+            { emoji: '☄️', label: 'Comet', size: 32, angleOffset: Math.PI * 0.75 },
         ],
         POWERUP_TYPES: [
             { id: 'magnet',  emoji: '🧲', color: '#ff6bff', label: 'MAGNET',       desc: 'Pulls debris toward you!' },
@@ -1028,6 +1028,7 @@
     let lastCollectTime = 0;
     let shakeTimer = 0;
     let frameCount = 0;
+    let animTime = 0; // smooth render clock (increments per rAF frame, independent of game ticks)
     let shownFacts = [];
     let powerups = [];
     let activePowerups = {};  // { id: remainingMs }
@@ -1149,7 +1150,7 @@
             if (this.y > CONFIG.HEIGHT + 5) this.reset();
         }
         draw() {
-            const twinkle = Math.sin(frameCount * this.twinkleSpeed + this.twinkleOffset) * 0.3 + 0.7;
+            const twinkle = Math.sin(animTime * this.twinkleSpeed + this.twinkleOffset) * 0.3 + 0.7;
             ctx.globalAlpha = this.brightness * twinkle;
             ctx.fillStyle = this.color;
             ctx.beginPath();
@@ -1386,7 +1387,7 @@
             this.targetTilt = 0;
             this.invincibleTimer = 0;
             this.trailTimer = 0;
-            this.bobOffset = 0;
+            this.moving = false;
         }
         update() {
             let dx = 0, dy = 0;
@@ -1428,18 +1429,18 @@
             this.targetTilt = dx * 0.3;
             this.tilt = lerp(this.tilt, this.targetTilt, 0.15);
 
-            // Bob
-            this.bobOffset = Math.sin(frameCount * 0.05) * 3;
+            // Track whether rocket is moving
+            this.moving = (dx !== 0 || dy !== 0);
 
             // Invincibility
             if (this.invincibleTimer > 0) this.invincibleTimer -= 16;
 
-            // Engine trail particles
+            // Engine trail particles — only when moving
             this.trailTimer++;
-            if (this.trailTimer % 2 === 0) {
+            if (this.moving && this.trailTimer % 3 === 0) {
                 const colors = ['#ff6b35', '#ffaa00', '#ff4444', '#ffdd44'];
                 particles.push(new Particle(
-                    this.x + rand(-4, 4),
+                    this.x + rand(-2, 2),
                     this.y + this.h / 2 + 5,
                     colors[randInt(0, 3)],
                     'trail'
@@ -1447,16 +1448,17 @@
             }
         }
         draw() {
-            if (this.invincibleTimer > 0 && Math.floor(frameCount / 4) % 2 === 0) return;
+            if (this.invincibleTimer > 0 && Math.floor(animTime / 4) % 2 === 0) return;
 
-            const drawY = this.y + this.bobOffset;
+            // When idle, no bob; when moving, gentle bob
+            const drawY = this.moving ? this.y + Math.sin(animTime * 0.05) * 2 : this.y;
             ctx.save();
             ctx.translate(this.x, drawY);
             ctx.rotate(this.tilt);
 
             // Shield glow
             if (this.invincibleTimer > 0) {
-                ctx.globalAlpha = 0.3 + Math.sin(frameCount * 0.2) * 0.15;
+                ctx.globalAlpha = 0.3 + Math.sin(animTime * 0.2) * 0.15;
                 const gradient = ctx.createRadialGradient(0, 0, 10, 0, 0, 35);
                 gradient.addColorStop(0, 'rgba(107, 240, 255, 0.4)');
                 gradient.addColorStop(1, 'rgba(107, 240, 255, 0)');
@@ -1529,33 +1531,34 @@
             ctx.lineTo(this.w / 4, this.h / 2);
             ctx.fill();
 
-            // Engine flame (animated)
-            const flameSize = 8 + Math.sin(frameCount * 0.4) * 4;
-            const flameGrad = ctx.createLinearGradient(0, this.h/2, 0, this.h/2 + flameSize + 10);
-            flameGrad.addColorStop(0, '#ffdd44');
-            flameGrad.addColorStop(0.4, '#ff6600');
-            flameGrad.addColorStop(1, 'rgba(255,0,0,0)');
+            // Engine flame (animated) — calmer when idle
+            const flameSize = this.moving ? 8 + Math.sin(animTime * 0.4) * 4 : 12 + Math.sin(animTime * 0.1) * 3;
+            const flameGrad = ctx.createLinearGradient(0, this.h/2, 0, this.h/2 + flameSize + 15);
+            flameGrad.addColorStop(0, '#ffee66');
+            flameGrad.addColorStop(0.3, '#ffaa00');
+            flameGrad.addColorStop(0.6, '#ff6600');
+            flameGrad.addColorStop(1, 'rgba(255,40,0,0)');
             ctx.fillStyle = flameGrad;
             ctx.beginPath();
-            ctx.moveTo(-8, this.h / 2);
-            ctx.quadraticCurveTo(0, this.h / 2 + flameSize + 10, 8, this.h / 2);
+            ctx.moveTo(-10, this.h / 2);
+            ctx.quadraticCurveTo(0, this.h / 2 + flameSize + 15, 10, this.h / 2);
             ctx.fill();
 
             // Small side flames
-            const sideFlame = 5 + Math.cos(frameCount * 0.5) * 3;
+            const sideFlame = this.moving ? 5 + Math.cos(animTime * 0.5) * 3 : 5 + Math.cos(animTime * 0.1) * 2;
             ctx.fillStyle = '#ff8800';
             ctx.beginPath();
-            ctx.moveTo(-6, this.h / 2);
-            ctx.quadraticCurveTo(-3, this.h / 2 + sideFlame + 5, 0, this.h / 2);
+            ctx.moveTo(-7, this.h / 2);
+            ctx.quadraticCurveTo(-3, this.h / 2 + sideFlame + 6, 0, this.h / 2);
             ctx.fill();
             ctx.beginPath();
             ctx.moveTo(0, this.h / 2);
-            ctx.quadraticCurveTo(3, this.h / 2 + sideFlame + 5, 6, this.h / 2);
+            ctx.quadraticCurveTo(3, this.h / 2 + sideFlame + 6, 7, this.h / 2);
             ctx.fill();
 
-            // Probe arms with net
-            const armWave = Math.sin(frameCount * 0.06) * 0.15;
-            const grabPulse = Math.sin(frameCount * 0.1) * 2;
+            // Probe arms with net — steady when idle
+            const armWave = this.moving ? Math.sin(animTime * 0.06) * 0.15 : 0;
+            const grabPulse = this.moving ? Math.sin(animTime * 0.1) * 2 : 0;
 
             // Left probe arm
             ctx.strokeStyle = '#aabbcc';
@@ -1613,7 +1616,7 @@
             // Horizontal net lines
             for (let i = 0; i < 3; i++) {
                 const ny = netTop + (netBot - netTop) * (i / 2);
-                const sag = Math.sin(frameCount * 0.08 + i) * 1.5;
+                const sag = Math.sin(animTime * 0.08 + i) * 1.5;
                 ctx.beginPath();
                 ctx.moveTo(netLeft - 6, ny);
                 ctx.quadraticCurveTo((netLeft + netRight) / 2, ny + 3 + sag, netRight + 6, ny);
@@ -1629,7 +1632,7 @@
             }
 
             // Net glow
-            ctx.globalAlpha = 0.25 + Math.sin(frameCount * 0.1) * 0.1;
+            ctx.globalAlpha = 0.25 + Math.sin(animTime * 0.1) * 0.1;
             const scoopGrad = ctx.createRadialGradient(0, netMidY, 3, 0, netMidY, 28);
             scoopGrad.addColorStop(0, 'rgba(107, 255, 107, 0.4)');
             scoopGrad.addColorStop(1, 'rgba(107, 255, 107, 0)');
@@ -1665,7 +1668,7 @@
             this.updatePosition();
         }
         updatePosition() {
-            const wobbleR = Math.sin(frameCount * 0.02 + this.wobble) * 5;
+            const wobbleR = Math.sin(animTime * 0.02 + this.wobble) * 5;
             this.x = CONFIG.EARTH_X + Math.cos(this.angle) * (this.orbitRadius + wobbleR);
             this.y = CONFIG.EARTH_Y + Math.sin(this.angle) * (this.orbitRadius + wobbleR);
         }
@@ -1687,7 +1690,7 @@
         }
         draw() {
             // Green recycle glow
-            ctx.globalAlpha = 0.3 + Math.sin(frameCount * 0.08) * 0.1;
+            ctx.globalAlpha = 0.3 + Math.sin(animTime * 0.08) * 0.1;
             const glow = ctx.createRadialGradient(this.x, this.y, 2, this.x, this.y, this.size + 8);
             glow.addColorStop(0, `hsla(${this.glowHue}, 100%, 70%, 0.4)`);
             glow.addColorStop(1, `hsla(${this.glowHue}, 100%, 70%, 0)`);
@@ -2157,9 +2160,9 @@
             this.y += this.vy;
         }
         draw() {
-            const pulse = Math.sin(frameCount * 0.18) * 0.3 + 0.7;
+            const pulse = Math.sin(animTime * 0.18) * 0.3 + 0.7;
             const flashSpeed = 0.2;
-            const flash = Math.sin(frameCount * flashSpeed) > 0;
+            const flash = Math.sin(animTime * flashSpeed) > 0;
 
             // Fire/speed trail behind the hazard
             const trailLen = 6;
@@ -2195,7 +2198,7 @@
             ctx.stroke();
 
             // Second animated ring
-            const ring2 = Math.sin(frameCount * 0.12 + 2) * 0.3 + 0.7;
+            const ring2 = Math.sin(animTime * 0.12 + 2) * 0.3 + 0.7;
             ctx.globalAlpha = 0.2 * ring2;
             ctx.strokeStyle = '#ffaa00';
             ctx.lineWidth = 1.5;
@@ -2208,7 +2211,7 @@
             // Emoji body (bigger, with shadow)
             ctx.save();
             ctx.translate(this.x, this.y);
-            // No rotation - emoji stays upright, fire trail shows direction
+            ctx.rotate(this.rotation);
             // Shadow
             ctx.globalAlpha = 0.3;
             ctx.font = `${this.size + 6}px 'Apple Color Emoji', 'Segoe UI Emoji', 'Noto Color Emoji', sans-serif`;
@@ -2231,8 +2234,8 @@
                 ctx.lineWidth = 2;
                 ctx.strokeText('⚠ DANGER', this.x, this.y - this.size - 8);
                 ctx.fillText('⚠ DANGER', this.x, this.y - this.size - 8);
-                ctx.globalAlpha = 1;
             }
+            ctx.globalAlpha = 1;
         }
         get hitRadius() { return this.size * 0.6; }
         get offScreen() {
@@ -2269,10 +2272,10 @@
         }
         draw() {
             // Blinking when about to expire
-            if (this.life < 120 && Math.floor(frameCount / 6) % 2 === 0) return;
+            if (this.life < 120 && Math.floor(animTime / 6) % 2 === 0) return;
 
-            const pulse = Math.sin(frameCount * 0.12) * 0.3 + 0.7;
-            const spinAngle = frameCount * 0.03;
+            const pulse = Math.sin(animTime * 0.12) * 0.3 + 0.7;
+            const spinAngle = animTime * 0.03;
 
             // Rotating sparkle rays
             ctx.save();
@@ -2311,7 +2314,7 @@
             ctx.stroke();
 
             // Second ring (offset pulse)
-            const pulse2 = Math.sin(frameCount * 0.12 + 1.5) * 0.3 + 0.7;
+            const pulse2 = Math.sin(animTime * 0.12 + 1.5) * 0.3 + 0.7;
             const ringSize2 = this.size + 6 + pulse2 * 10;
             ctx.globalAlpha = 0.2 * pulse2;
             ctx.lineWidth = 1.5;
@@ -2331,16 +2334,14 @@
             ctx.fill();
             ctx.globalAlpha = 1;
 
-            // Emoji (larger, with bounce)
+            // Canvas-drawn icon (iOS Safari can't render emoji on canvas)
             ctx.save();
             ctx.translate(this.x, this.y);
-            const bobY = Math.sin(frameCount * 0.08) * 4;
-            const scale = 1 + Math.sin(frameCount * 0.15) * 0.1;
+            const bobY = Math.sin(animTime * 0.08) * 4;
+            const scale = 1 + Math.sin(animTime * 0.15) * 0.1;
             ctx.scale(scale, scale);
-            ctx.font = `${this.size + 4}px 'Apple Color Emoji', 'Segoe UI Emoji', 'Noto Color Emoji', sans-serif`;
-            ctx.textAlign = 'center';
-            ctx.textBaseline = 'middle';
-            ctx.fillText(this.emoji, 0, bobY);
+            ctx.translate(0, bobY);
+            this.drawIcon(ctx);
             ctx.restore();
 
             // Small orbiting sparkle dots
@@ -2359,6 +2360,154 @@
         }
         get hitRadius() { return this.size * 0.8; }
         get dead() { return this.life <= 0 || this.collected; }
+        drawIcon(ctx) {
+            const s = this.size * 0.5;
+            if (this.id === 'magnet') {
+                // Horseshoe magnet
+                ctx.strokeStyle = '#ff2244';
+                ctx.lineWidth = 4;
+                ctx.lineCap = 'round';
+                ctx.beginPath();
+                ctx.arc(0, -2, s * 0.6, Math.PI, 0, false);
+                ctx.stroke();
+                // Left leg
+                ctx.strokeStyle = '#ff2244';
+                ctx.beginPath();
+                ctx.moveTo(-s * 0.6, -2);
+                ctx.lineTo(-s * 0.6, s * 0.5);
+                ctx.stroke();
+                // Right leg
+                ctx.beginPath();
+                ctx.moveTo(s * 0.6, -2);
+                ctx.lineTo(s * 0.6, s * 0.5);
+                ctx.stroke();
+                // Tips (silver)
+                ctx.strokeStyle = '#cccccc';
+                ctx.beginPath();
+                ctx.moveTo(-s * 0.6, s * 0.5);
+                ctx.lineTo(-s * 0.6, s * 0.8);
+                ctx.stroke();
+                ctx.beginPath();
+                ctx.moveTo(s * 0.6, s * 0.5);
+                ctx.lineTo(s * 0.6, s * 0.8);
+                ctx.stroke();
+                // Field lines
+                ctx.strokeStyle = 'rgba(255,100,255,0.4)';
+                ctx.lineWidth = 1;
+                ctx.setLineDash([2, 3]);
+                ctx.beginPath();
+                ctx.arc(0, s * 0.3, s * 0.3, Math.PI, 0, false);
+                ctx.stroke();
+                ctx.setLineDash([]);
+            } else if (this.id === 'shield') {
+                // Shield shape
+                ctx.fillStyle = '#6bf0ff';
+                ctx.beginPath();
+                ctx.moveTo(0, -s * 0.9);
+                ctx.quadraticCurveTo(s * 0.9, -s * 0.5, s * 0.8, s * 0.1);
+                ctx.quadraticCurveTo(s * 0.4, s * 0.7, 0, s * 0.9);
+                ctx.quadraticCurveTo(-s * 0.4, s * 0.7, -s * 0.8, s * 0.1);
+                ctx.quadraticCurveTo(-s * 0.9, -s * 0.5, 0, -s * 0.9);
+                ctx.fill();
+                // Inner highlight
+                ctx.fillStyle = 'rgba(255,255,255,0.3)';
+                ctx.beginPath();
+                ctx.moveTo(0, -s * 0.6);
+                ctx.quadraticCurveTo(s * 0.5, -s * 0.3, s * 0.4, s * 0.05);
+                ctx.quadraticCurveTo(s * 0.15, s * 0.3, 0, s * 0.4);
+                ctx.quadraticCurveTo(-s * 0.15, s * 0.3, -s * 0.4, s * 0.05);
+                ctx.quadraticCurveTo(-s * 0.5, -s * 0.3, 0, -s * 0.6);
+                ctx.fill();
+                // Star in center
+                ctx.fillStyle = '#fff';
+                ctx.beginPath();
+                for (let i = 0; i < 5; i++) {
+                    const a = -Math.PI / 2 + (i * 2 * Math.PI / 5);
+                    const r = i % 2 === 0 ? s * 0.25 : s * 0.1;
+                    if (i === 0) ctx.moveTo(Math.cos(a) * r, Math.sin(a) * r);
+                    else ctx.lineTo(Math.cos(a) * r, Math.sin(a) * r);
+                    const a2 = a + Math.PI / 5;
+                    const r2 = i % 2 === 0 ? s * 0.1 : s * 0.25;
+                    ctx.lineTo(Math.cos(a2) * r2, Math.sin(a2) * r2);
+                }
+                ctx.fill();
+            } else if (this.id === 'speed') {
+                // Lightning bolt
+                ctx.fillStyle = '#ffeb3b';
+                ctx.beginPath();
+                ctx.moveTo(s * 0.15, -s * 0.9);
+                ctx.lineTo(-s * 0.4, s * 0.05);
+                ctx.lineTo(-s * 0.05, s * 0.05);
+                ctx.lineTo(-s * 0.15, s * 0.9);
+                ctx.lineTo(s * 0.4, -s * 0.05);
+                ctx.lineTo(s * 0.05, -s * 0.05);
+                ctx.closePath();
+                ctx.fill();
+                // Bright edge
+                ctx.strokeStyle = '#fff8c4';
+                ctx.lineWidth = 1;
+                ctx.stroke();
+            } else if (this.id === 'double') {
+                // 2x star sparkle
+                // Outer star
+                ctx.fillStyle = '#6bff6b';
+                ctx.beginPath();
+                for (let i = 0; i < 4; i++) {
+                    const a = (i / 4) * Math.PI * 2 - Math.PI / 4;
+                    const outerR = s * 0.85;
+                    const innerR = s * 0.25;
+                    ctx.lineTo(Math.cos(a) * outerR, Math.sin(a) * outerR);
+                    const a2 = a + Math.PI / 4;
+                    ctx.lineTo(Math.cos(a2) * innerR, Math.sin(a2) * innerR);
+                }
+                ctx.closePath();
+                ctx.fill();
+                // Center dot
+                ctx.fillStyle = '#ffffff';
+                ctx.beginPath();
+                ctx.arc(0, 0, s * 0.18, 0, Math.PI * 2);
+                ctx.fill();
+                // "2x" text
+                ctx.fillStyle = '#1a5a1a';
+                ctx.font = `bold ${s * 0.55}px "Fredoka One", Arial`;
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.fillText('2×', 0, 1);
+            } else if (this.id === 'freeze') {
+                // Snowflake
+                ctx.strokeStyle = '#aaeeff';
+                ctx.lineWidth = 2;
+                ctx.lineCap = 'round';
+                for (let i = 0; i < 6; i++) {
+                    const a = (i / 6) * Math.PI * 2;
+                    const cos = Math.cos(a), sin = Math.sin(a);
+                    // Main branch
+                    ctx.beginPath();
+                    ctx.moveTo(0, 0);
+                    ctx.lineTo(cos * s * 0.85, sin * s * 0.85);
+                    ctx.stroke();
+                    // Small side branches
+                    const bx = cos * s * 0.5, by = sin * s * 0.5;
+                    const perpCos = Math.cos(a + 0.5), perpSin = Math.sin(a + 0.5);
+                    const perpCos2 = Math.cos(a - 0.5), perpSin2 = Math.sin(a - 0.5);
+                    ctx.lineWidth = 1.5;
+                    ctx.beginPath();
+                    ctx.moveTo(bx, by);
+                    ctx.lineTo(bx + perpCos * s * 0.25, by + perpSin * s * 0.25);
+                    ctx.stroke();
+                    ctx.beginPath();
+                    ctx.moveTo(bx, by);
+                    ctx.lineTo(bx + perpCos2 * s * 0.25, by + perpSin2 * s * 0.25);
+                    ctx.stroke();
+                    ctx.lineWidth = 2;
+                }
+                // Center dot
+                ctx.fillStyle = '#ffffff';
+                ctx.beginPath();
+                ctx.arc(0, 0, 2.5, 0, Math.PI * 2);
+                ctx.fill();
+            }
+        }
     }
 
     // ===== NEBULA CLOUDS (BACKGROUND) =====
@@ -2894,7 +3043,7 @@
 
             // Shield bubble around rocket
             if (activePowerups.shield) {
-                ctx.globalAlpha = 0.2 + Math.sin(frameCount * 0.15) * 0.1;
+                ctx.globalAlpha = 0.2 + Math.sin(animTime * 0.15) * 0.1;
                 const shieldGrad = ctx.createRadialGradient(rocket.x, rocket.y, 10, rocket.x, rocket.y, 40);
                 shieldGrad.addColorStop(0, 'rgba(107, 240, 255, 0.05)');
                 shieldGrad.addColorStop(0.7, 'rgba(107, 240, 255, 0.2)');
@@ -2905,7 +3054,7 @@
                 ctx.fill();
                 ctx.strokeStyle = '#6bf0ff';
                 ctx.lineWidth = 1.5;
-                ctx.globalAlpha = 0.4 + Math.sin(frameCount * 0.2) * 0.2;
+                ctx.globalAlpha = 0.4 + Math.sin(animTime * 0.2) * 0.2;
                 ctx.beginPath();
                 ctx.arc(rocket.x, rocket.y, 38, 0, Math.PI * 2);
                 ctx.stroke();
@@ -2914,7 +3063,7 @@
 
             // Magnet field visual
             if (activePowerups.magnet) {
-                ctx.globalAlpha = 0.08 + Math.sin(frameCount * 0.1) * 0.04;
+                ctx.globalAlpha = 0.08 + Math.sin(animTime * 0.1) * 0.04;
                 ctx.strokeStyle = '#ff6bff';
                 ctx.lineWidth = 1;
                 ctx.setLineDash([4, 6]);
@@ -3012,27 +3161,12 @@
     pauseBtn.addEventListener('click', togglePause);
     resumeBtn.addEventListener('click', togglePause);
 
-    // ===== FIXED TIMESTEP GAME LOOP =====
-    const FIXED_DT = 1000 / 60; // 16.67ms per tick (60fps equivalent)
-    let lastTime = 0;
-    let accumulator = 0;
-
-    function gameLoop(timestamp) {
-        if (!lastTime) lastTime = timestamp;
-        let elapsed = timestamp - lastTime;
-        lastTime = timestamp;
-
-        // Cap elapsed to prevent spiral of death (e.g. tab was hidden)
-        if (elapsed > 200) elapsed = 200;
-
+    // ===== GAME LOOP =====
+    function gameLoop() {
+        animTime++;
         if (!paused) {
-            accumulator += elapsed;
-            while (accumulator >= FIXED_DT) {
-                update();
-                accumulator -= FIXED_DT;
-            }
+            update();
         }
-
         draw();
         requestAnimationFrame(gameLoop);
     }
@@ -3108,7 +3242,7 @@
 
     // Start the animation loop (for star background on start screen too)
     function startScreenLoop() {
-        frameCount++;
+        animTime++;
         stars.forEach(s => s.update());
         nebulae.forEach(n => n.update());
         earth.update();
